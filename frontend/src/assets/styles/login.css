@@ -1,0 +1,19 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.background {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #0a001a 34%,
+    #1a0033 70%,
+    #4b0082 100%
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
