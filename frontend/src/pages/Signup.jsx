@@ -8,19 +8,26 @@ import LinkComponent from "../components/LinkComponent.jsx";
 import { FaUser } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
+import toast from "react-hot-toast";
+import {useNavigate} from "react-router-dom"
 
 function Signup() {
-  const [form, setFrom] = useState({
+  const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const navigate = useNavigate()
+
   async function handleSubmit(e) {
     e.preventDefault();
+    setValidationErrors({})
     if (form.confirmPassword !== form.password) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match")
       return;
     }
 
@@ -30,13 +37,26 @@ function Signup() {
         email: form.email,
         password: form.password,
       });
-      console.log(res.msg);
+      toast.success(res.msg);
+      setForm({ username: "", email: "", password: "", confirmPassword: "" });
+      navigate("/login")
     } catch (error) {
-      console.log(error.message);
+      if (error.details) {
+        const fieldErrors = {}
+        error.details.forEach((err)=>{
+          if(!fieldErrors[err.field]){
+              fieldErrors[err.field] = []
+          }
+          fieldErrors[err.field].push(err.message)
+        })
+        setValidationErrors(fieldErrors)
+      } else {
+        toast.error(error.message);
+      }
     }
   }
 
-  const { signup, loading, error } = useAuthStore();
+  const { signup, loading } = useAuthStore();
 
   return (
     <>
@@ -45,12 +65,13 @@ function Signup() {
           <form onSubmit={handleSubmit}>
             <h1>Signup</h1>
             <InputField
-              placeholder={"Username"}
-              name={"Username"}
+              placeholder={"username"}
+              name={"username"}
               type={"text"}
               value={form.username}
               icon={<FaUser />}
-              onChange={(e) => setFrom({ ...form, username: e.target.value })}
+              error = {validationErrors.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
             />
             <InputField
               icon={<MdEmail />}
@@ -58,7 +79,8 @@ function Signup() {
               name={"email"}
               type={"email"}
               value={form.email}
-              onChange={(e) => setFrom({ ...form, email: e.target.value })}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              error = {validationErrors.email}
             />
             <InputField
               placeholder={"password"}
@@ -66,7 +88,8 @@ function Signup() {
               icon={<RiLockPasswordFill />}
               type={"password"}
               value={form.password}
-              onChange={(e) => setFrom({ ...form, password: e.target.value })}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              error = {validationErrors.password}
             />
             <InputField
               icon={<RiLockPasswordFill />}
@@ -75,11 +98,9 @@ function Signup() {
               type={"password"}
               value={form.confirmPassword}
               onChange={(e) =>
-                setFrom({ ...form, confirmPassword: e.target.value })
+                setForm({ ...form, confirmPassword: e.target.value })
               }
             />
-
-            {error && <p style={{ color: "red" }}>{error}</p>}
 
             <Button
               type={"submit"}
@@ -88,7 +109,7 @@ function Signup() {
             />
             <div className="register-link">
               <p>
-                Don't have an account?{" "}
+                Already have an account?{" "}
                 <LinkComponent label={"Login"} path={"/login"} />
               </p>
             </div>

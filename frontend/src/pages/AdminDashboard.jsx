@@ -1,6 +1,7 @@
 
 function AdminDashboard(){
     return <>
+    admin
     </>
 }
 

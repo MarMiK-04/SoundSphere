@@ -3,14 +3,12 @@ import { loginUser, signupUser, getMe } from "../api/auth.api.js";
 
 const useAuthStore = create((set) => ({
   user: null,
-  token: localStorage.getItem("token") || null,
   loading: false,
-  error: null,
+  isCheckingAuht : true,
 
   login: async (data) => {
     set({
       loading: true,
-      error: null,
     });
 
     try {
@@ -20,13 +18,11 @@ const useAuthStore = create((set) => ({
       const userRes = await getMe();
       set({
         user: userRes.data,
-        token,
         loading: false,
       });
       return res;
     } catch (err) {
       set({
-        error: err.message,
         loading: false,
       });
       throw err;
@@ -35,7 +31,6 @@ const useAuthStore = create((set) => ({
   signup: async (data) => {
     set({
       loading: true,
-      error: null,
     });
 
     try {
@@ -46,7 +41,6 @@ const useAuthStore = create((set) => ({
       return res;
     } catch (err) {
       set({
-        error: err.message,
         loading: false,
       });
       throw err;
@@ -56,22 +50,24 @@ const useAuthStore = create((set) => ({
   fetchUser: async () => {
     set({
       loading: true,
-      error: null,
+      isCheckingAuht : true
     });
     try {
       const res = await getMe();
       set({
         user: res.data,
         loading: false,
+        isCheckingAuht : false
       });
       return res;
     } catch (err) {
+      localStorage.removeItem("token");
       set({
         user: null,
-        error: err.message,
-        token : null,
         loading: false,
+        isCheckingAuht : false
       });
+      throw err;
     }
   },
 
@@ -79,7 +75,6 @@ const useAuthStore = create((set) => ({
     localStorage.removeItem("token");
     set({
       user: null,
-      token: null,
     });
   },
 }));

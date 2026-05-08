@@ -75,6 +75,7 @@ export const signup = async (req, res, next) => {
       .min(6, { message: `password must be atleast 6 character long` })
       .max(20, { message: `password max length is 20 character` })
       .regex(/[a-z]/, { message: "Must include lowercase" })
+      .regex(/[0-9]/, { message: "Must include number" })
       .regex(/[A-Z]/, { message: "Must include uppercase" })
       .regex(/[^a-zA-Z0-9]/, { message: "Must include special char" }),
   });
@@ -98,13 +99,11 @@ export const signup = async (req, res, next) => {
       return next(error);
     }
 
-    const lowercaseEmail = email.toLowerCase();
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.create({
       username,
-      email: lowercaseEmail,
+      email,
       password: hashedPassword,
       role: "user",
     });
