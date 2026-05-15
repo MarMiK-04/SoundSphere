@@ -6,6 +6,7 @@ import {
   updateSong,
   deleteSong,
   searchSong,
+  incrementPlayCount
 } from "../controller/song.controller.js";
 import adminAuth from "../middleware/adminAuth.js";
 import upload from "../middleware/multer.middleware.js";
@@ -29,7 +30,22 @@ router.post(
 );
 router.get("/search", searchSong);
 router.get("/:songId", getSong);
-router.put("/:songId", adminAuth, updateSong);
+router.put(
+  "/:songId",
+  adminAuth,
+  upload.fields([
+    {
+      name: "coverImage",
+      maxCount: 1,
+    },
+    {
+      name: "song",
+      maxCount: 1,
+    },
+  ]),
+  updateSong,
+);
+router.patch("/:songId/increment-play",incrementPlayCount)
 router.delete("/:songId", adminAuth, deleteSong);
 
 export default router;
